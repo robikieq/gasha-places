@@ -1,10 +1,12 @@
 import React, { Component } from "react";
-import "./Dropzone.css";
+import "./DropZone.css";
 
-class Dropzone extends Component {
+class DropZone extends Component {
   constructor(props) {
     super(props);
-    this.state = { hightlight: false };
+    this.state = {
+      hightlight: false
+    };
     this.fileInputRef = React.createRef();
 
     this.openFileDialog = this.openFileDialog.bind(this);
@@ -60,7 +62,7 @@ class Dropzone extends Component {
   render() {
     return (
       <div
-        className={`Dropzone ${this.state.hightlight ? "Highlight" : ""}`}
+        className={`DropZone ${this.state.hightlight ? "Highlight" : ""}`}
         onDragOver={this.onDragOver}
         onDragLeave={this.onDragLeave}
         onDrop={this.onDrop}
@@ -84,4 +86,4 @@ class Dropzone extends Component {
   }
 }
 
-export default Dropzone;
+export default DropZone;
