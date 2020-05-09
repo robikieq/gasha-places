@@ -1,65 +1,45 @@
-import React, { Component } from "react";
-import moment from 'moment';
+import React, { useEffect, useRef, useState } from "react";
 
-import {
-  withScriptjs,
-  withGoogleMap,
-  GoogleMap,
-  Marker
-} from "react-google-maps";
-
-export class Map extends Component {
-    constructor(props) {
-      super(props);
-      this.state = {
-        mapPosition: {
-          lat: this.props.center.lat,
-          lng: this.props.center.lng
-        },
-        mapLocations: this.props.locations,
-        markerPosition: {
-          lat: this.props.center.lat,
-          lng: this.props.center.lng
-        }
-      };
+export default function Map({
+  zoom = 10,
+  center,
+  height = 500,
+  width = "100%",
+  locations = [],
+}) {
+  const mapElRef = useRef(null);
+  const [googleMap, setGoogleMap] = useState(null);
+  useEffect(() => {
+    const googleMapScript = document.createElement("script");
+    googleMapScript.src = `https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=geometry,drawing,places&key=${process.env.REACT_APP_GOOGLE_KEY}`;
+    googleMapScript.addEventListener("load", () => {
+      const googleMap = new window.google.maps.Map(mapElRef.current, {
+        zoom,
+        center,
+      });
+      setGoogleMap(googleMap);
+    });
+    window.document.body.appendChild(googleMapScript);
+  }, [zoom, center]);
+  useEffect(() => {
+    if (!googleMap) {
+      return;
     }
-
-  render() {
-    const WrappedMap = withScriptjs(
-      withGoogleMap(props => (
-        <GoogleMap
-          google={this.props.google}
-          defaultZoom={this.props.zoom}
-          defaultCenter={{ lat: this.state.mapPosition.lat, lng: this.state.mapPosition.lng }}>
-          {this.props.locations &&
-            this.props.locations.map((place, i) => {
-              let lat = parseFloat(place.latitude, 10);
-              let lng = parseFloat(place.longitude, 10);
-              return (
-                <Marker
-                  id={place.id}
-                  key={place.id}
-                  position={{ lat: lat, lng: lng }}
-                  title={moment(place.time).format('DD/MM/YYYY')}>
-                </Marker>
-              );
-            })
-          }
-        </GoogleMap>
-      ))
-    );
-
-    return (
-      <div>
-        <WrappedMap
-            googleMapURL={`https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=geometry,drawing,places&key=${process.env.REACT_APP_GOOGLE_KEY}`}
-            loadingElement={<div style={{ height: `100%` }} />}
-            containerElement={<div style={{ height: "100vh", width: "100%"}} />}
-            mapElement={<div style={{ height: `100%` }} />}
-        />
-      </div>
-    );
-  }
+    const markers = [];
+    locations.forEach((location) => {
+      const lat = parseFloat(location.latitude, 10);
+      const lng = parseFloat(location.longitude, 10);
+      const marker = new window.google.maps.Marker({
+        position: { lat, lng },
+        map: googleMap,
+      });
+      markers.push(marker);
+    });
+    return () => {
+      markers.forEach((marker) => {
+        marker.setMap(null);
+      });
+    };
+  }, [locations, googleMap]);
+  return <div id="google-map" ref={mapElRef} style={{ height, width }} />;
 }
-
-export default Map;
