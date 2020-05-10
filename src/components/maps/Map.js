@@ -45,7 +45,7 @@ export default function Map({
       return;
     }
     const markers = [];
-    locations.forEach((location) => {
+    locations.forEach((location, index) => {
       const lat = parseFloat(location.latitude, 10);
       const lng = parseFloat(location.longitude, 10);
       const infoContent = `<div class="${
@@ -55,7 +55,7 @@ export default function Map({
         "h:mm a"
       )}</h3><div class="${classes.infoRow}"><span class="${
         classes.infoRowTitle
-      }">Index</span><span>${location.id}</span></div><div class="${
+      }">Index</span><span>${index}</span></div><div class="${
         classes.infoRow
       }"><span class="${
         classes.infoRowTitle
