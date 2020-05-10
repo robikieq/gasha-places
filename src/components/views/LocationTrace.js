@@ -7,6 +7,7 @@ import {
   Divider,
   Tooltip,
   TextField,
+  Snackbar,
 } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import Map from "../maps/Map";
@@ -15,6 +16,7 @@ import DateFnsUtils from "@date-io/date-fns";
 import format from "date-fns/format";
 import parse from "date-fns/parse";
 import CloudUploadIcon from "@material-ui/icons/CloudUpload";
+import Alert from "@material-ui/lab/Alert";
 
 const useStyles = makeStyles((theme) => ({
   grow: {
@@ -73,8 +75,26 @@ export default function LocationTrace() {
   const classes = useStyles();
   const [selectedDate, setSelectedDate] = useState("");
   const [dateLocationMap, setDateLocationMap] = useState({});
+  const [invalidFileUploaded, setInvalidFileUploaded] = useState(false);
+  const handleErrorSnackbarClose = () => setInvalidFileUploaded(false);
   const handleFilesUpload = (event) => {
+    function isValidFormat(meta) {
+      if (meta.fields && meta.fields.length > 3) {
+        if (
+          meta.fields.indexOf("latitude") !== -1 &&
+          meta.fields.indexOf("longitude") !== -1 &&
+          meta.fields.indexOf("time") !== 0
+        ) {
+          return true;
+        }
+      }
+      return false;
+    }
     function updateData(results) {
+      if (!isValidFormat(results.meta)) {
+        setInvalidFileUploaded(true);
+        return;
+      }
       // Convert unix timestamp to Date.
       const locationData = results.data.map((location) => {
         return {
@@ -102,6 +122,9 @@ export default function LocationTrace() {
       setDateLocationMap(dateLocationMap);
     }
 
+    if (event.target.files.length === 0) {
+      return;
+    }
     Papa.parse(event.target.files[0], {
       complete: updateData,
       dynamicTyping: true,
@@ -149,6 +172,7 @@ export default function LocationTrace() {
         {locations && locations.length > 0 && renderLocationDatePicker()}
         <Divider className={classes.divider} orientation="vertical" />
         <input
+          accept=".csv"
           type="file"
           name="file"
           ref={fileRef}
@@ -173,6 +197,18 @@ export default function LocationTrace() {
         height="100vh"
         zoom={13}
       />
+      <Snackbar
+        open={invalidFileUploaded}
+        autoHideDuration={6000}
+        onClose={handleErrorSnackbarClose}>
+        <Alert
+          onClose={handleErrorSnackbarClose}
+          severity="error"
+          elevation={6}
+          variant="filled">
+          Invalid File Format!
+        </Alert>
+      </Snackbar>
     </Fragment>
   );
 }
