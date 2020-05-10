@@ -1,23 +1,54 @@
-import React, { useState, useMemo, useRef } from "react";
+import React, { useState, useMemo, useRef, Fragment } from "react";
 import Papa from "papaparse";
-import { Grid } from "@material-ui/core";
+import {
+  Paper,
+  IconButton,
+  Typography,
+  Divider,
+  InputBase,
+  Tooltip,
+} from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import Map from "../maps/Map";
 import { MuiPickersUtilsProvider, DatePicker } from "@material-ui/pickers";
 import DateFnsUtils from "@date-io/date-fns";
 import format from "date-fns/format";
 import parse from "date-fns/parse";
+import CloudUploadIcon from "@material-ui/icons/CloudUpload";
 
 const useStyles = makeStyles((theme) => ({
-  root: {
-    flexGrow: 1,
+  grow: {
+    flex: 1,
   },
-  paper: {
-    height: 140,
-    width: 100,
+  toolbarContainer: {
+    position: "absolute",
+    top: theme.spacing(2),
+    left: "50%",
+    transform: "translateX(-50%)",
+    padding: "2px 4px",
+    display: "flex",
+    alignItems: "center",
+    width: 400,
+    zIndex: theme.zIndex.appBar,
   },
-  control: {
-    padding: theme.spacing(2),
+  headline: {
+    marginLeft: theme.spacing(1),
+    flex: 1,
+    color: theme.palette.text.secondary,
+  },
+  datePickerInput: {
+    marginLeft: theme.spacing(1),
+    flex: 1,
+  },
+  fileUploadInput: {
+    display: "none",
+  },
+  divider: {
+    height: 28,
+    margin: 4,
+  },
+  uploadButton: {
+    padding: 10,
   },
 }));
 
@@ -27,7 +58,13 @@ function getSortedDates(dateLocationMap) {
   );
 }
 
+function DatePickerInput(props) {
+  const classes = useStyles();
+  return <InputBase className={classes.datePickerInput} {...props} />;
+}
+
 export default function LocationTrace() {
+  const classes = useStyles();
   const [selectedDate, setSelectedDate] = useState("");
   const [dateLocationMap, setDateLocationMap] = useState({});
   const handleFilesUpload = (event) => {
@@ -93,39 +130,47 @@ export default function LocationTrace() {
           format="dd/MM/yyyy"
           value={value}
           onChange={handleSelectChange}
+          TextFieldComponent={DatePickerInput}
         />
       </MuiPickersUtilsProvider>
     );
   };
 
   return (
-    <div>
-      <h1>LocationTrace</h1>
-      <Grid container justify="left" className={useStyles.root} spacing={2}>
-        <Grid item xs={6} sm={6}>
-          <div>
-            <input
-              type="file"
-              name="file"
-              ref={fileRef}
-              placeholder={null}
-              onChange={handleFilesUpload}
-            />
-          </div>
-        </Grid>
-        <Grid item xs={6} sm={6}>
-          <div>
-            {locations && locations.length > 0 && renderLocationDatePicker()}
-          </div>
-        </Grid>
-      </Grid>
-
+    <Fragment>
+      <Paper component="form" className={classes.toolbarContainer}>
+        {(!locations || locations.length === 0) && (
+          <Typography variant="subtitle2" className={classes.headline}>
+            COVID Patient Location Tracer
+          </Typography>
+        )}
+        {locations && locations.length > 0 && renderLocationDatePicker()}
+        <Divider className={classes.divider} orientation="vertical" />
+        <input
+          type="file"
+          name="file"
+          ref={fileRef}
+          id="fileUploader"
+          onChange={handleFilesUpload}
+          className={classes.fileUploadInput}
+        />
+        <Tooltip title="Upload Patient Location Data">
+          <label htmlFor="fileUploader">
+            <IconButton
+              color="primary"
+              className={classes.uploadButton}
+              component="span">
+              <CloudUploadIcon />
+            </IconButton>
+          </label>
+        </Tooltip>
+      </Paper>
       <Map
         locations={dateLocationMap[selectedDate]}
         center={mapCenter}
-        height="500px"
-        zoom={10}
+        height="100vh"
+        zoom={13}
       />
-    </div>
+    </Fragment>
   );
 }
