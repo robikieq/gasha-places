@@ -81,6 +81,7 @@ export default function LocationTrace() {
     function isValidFormat(meta) {
       if (meta.fields && meta.fields.length > 3) {
         if (
+          meta.fields.indexOf("id") !== -1 &&
           meta.fields.indexOf("latitude") !== -1 &&
           meta.fields.indexOf("longitude") !== -1 &&
           meta.fields.indexOf("time") !== 0
@@ -105,11 +106,7 @@ export default function LocationTrace() {
       const dateLocationMap = {};
 
       for (let entry of locationData) {
-        const locationValue = {
-          latitude: entry.latitude,
-          longitude: entry.longitude,
-          time: entry.date,
-        };
+        const locationValue = { ...entry };
         if (dateLocationMap[entry.date]) {
           dateLocationMap[entry.date].push(locationValue);
         } else {
