@@ -5,8 +5,8 @@ import {
   IconButton,
   Typography,
   Divider,
-  InputBase,
   Tooltip,
+  TextField,
 } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import Map from "../maps/Map";
@@ -58,9 +58,15 @@ function getSortedDates(dateLocationMap) {
   );
 }
 
-function DatePickerInput(props) {
+function DatePickerInput({ InputProps, ...props }) {
   const classes = useStyles();
-  return <InputBase className={classes.datePickerInput} {...props} />;
+  return (
+    <TextField
+      InputProps={{ ...InputProps, disableUnderline: true }}
+      className={classes.datePickerInput}
+      {...props}
+    />
+  );
 }
 
 export default function LocationTrace() {
@@ -116,10 +122,6 @@ export default function LocationTrace() {
     const maxDate = parse(dates[dates.length - 1], "dd/MM/yyyy", new Date());
 
     const value = selectedDate && parse(selectedDate, "dd/MM/yyyy", new Date());
-    console.log({
-      minDate,
-      maxDate,
-    });
     return (
       <MuiPickersUtilsProvider utils={DateFnsUtils}>
         <DatePicker
@@ -127,7 +129,7 @@ export default function LocationTrace() {
           disabled={locations && locations.length === 0}
           minDate={minDate}
           maxDate={maxDate}
-          format="dd/MM/yyyy"
+          format="MMMM d, yyyy"
           value={value}
           onChange={handleSelectChange}
           TextFieldComponent={DatePickerInput}
