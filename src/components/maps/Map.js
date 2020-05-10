@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import format from "date-fns/format";
 import red from "@material-ui/core/colors/red";
 import { makeStyles } from "@material-ui/core";
+import MarkerClusterer from "@google/markerclustererplus";
 
 const useStyles = makeStyles((theme) => ({
   infoRoot: {
@@ -18,6 +19,13 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+function addScript(src, onLoad) {
+  const script = document.createElement("script");
+  script.src = src;
+  script.addEventListener("load", onLoad);
+  window.document.body.appendChild(script);
+}
+
 export default function Map({
   zoom = 10,
   center,
@@ -29,16 +37,16 @@ export default function Map({
   const mapElRef = useRef(null);
   const [googleMap, setGoogleMap] = useState(null);
   useEffect(() => {
-    const googleMapScript = document.createElement("script");
-    googleMapScript.src = `https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=geometry,drawing,places&key=${process.env.REACT_APP_GOOGLE_KEY}`;
-    googleMapScript.addEventListener("load", () => {
-      const googleMap = new window.google.maps.Map(mapElRef.current, {
-        zoom,
-        center,
-      });
-      setGoogleMap(googleMap);
-    });
-    window.document.body.appendChild(googleMapScript);
+    addScript(
+      `https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=geometry,drawing,places&key=${process.env.REACT_APP_GOOGLE_KEY}`,
+      () => {
+        const googleMap = new window.google.maps.Map(mapElRef.current, {
+          zoom,
+          center,
+        });
+        setGoogleMap(googleMap);
+      }
+    );
   }, [zoom, center]);
   useEffect(() => {
     if (!googleMap) {
@@ -69,12 +77,15 @@ export default function Map({
       });
       const marker = new window.google.maps.Marker({
         position: { lat, lng },
-        map: googleMap,
       });
       marker.addListener("click", function () {
         infoWindow.open(googleMap, marker);
       });
       markers.push(marker);
+    });
+    const markerClusterer = new MarkerClusterer(googleMap, markers, {
+      imagePath:
+        "https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m",
     });
     const travelPath = new window.google.maps.Polyline({
       path: markers.map((marker) => ({
@@ -88,6 +99,7 @@ export default function Map({
     });
     travelPath.setMap(googleMap);
     return () => {
+      markerClusterer.setMap(null);
       markers.forEach((marker) => {
         marker.setMap(null);
       });
