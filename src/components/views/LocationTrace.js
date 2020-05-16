@@ -18,41 +18,46 @@ import parse from "date-fns/parse";
 import CloudUploadIcon from "@material-ui/icons/CloudUpload";
 import Alert from "@material-ui/lab/Alert";
 
-const useStyles = makeStyles((theme) => ({
-  grow: {
-    flex: 1,
-  },
-  toolbarContainer: {
-    position: "absolute",
-    top: theme.spacing(2),
-    left: "50%",
-    transform: "translateX(-50%)",
-    padding: "2px 4px",
-    display: "flex",
-    alignItems: "center",
-    width: 400,
-    zIndex: theme.zIndex.appBar,
-  },
-  headline: {
-    marginLeft: theme.spacing(1),
-    flex: 1,
-    color: theme.palette.text.secondary,
-  },
-  datePickerInput: {
-    marginLeft: theme.spacing(1),
-    flex: 1,
-  },
-  fileUploadInput: {
-    display: "none",
-  },
-  divider: {
-    height: 28,
-    margin: 4,
-  },
-  uploadButton: {
-    padding: 10,
-  },
-}));
+const useStyles = makeStyles((theme) => {
+  return {
+    grow: {
+      flex: 1,
+    },
+    toolbarContainer: {
+      position: "absolute",
+      top: theme.spacing(2),
+      left: "50%",
+      transform: "translateX(-50%)",
+      padding: "2px 4px",
+      display: "flex",
+      alignItems: "center",
+      width: 400,
+      zIndex: theme.zIndex.appBar,
+      "@media (max-width:400px)": {
+        width: "95%",
+      },
+    },
+    headline: {
+      padding: `0 ${theme.spacing(1)}px`,
+      flex: 1,
+      color: theme.palette.text.secondary,
+    },
+    datePickerInput: {
+      marginLeft: theme.spacing(1),
+      flex: 1,
+    },
+    fileUploadInput: {
+      display: "none",
+    },
+    divider: {
+      height: 28,
+      margin: 4,
+    },
+    uploadButton: {
+      padding: 10,
+    },
+  };
+});
 
 function getSortedDates(dateLocationMap) {
   return Object.keys(dateLocationMap).sort((date1, date2) =>
