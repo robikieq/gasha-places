@@ -89,7 +89,7 @@ export default function LocationTrace() {
           meta.fields.indexOf("id") !== -1 &&
           meta.fields.indexOf("latitude") !== -1 &&
           meta.fields.indexOf("longitude") !== -1 &&
-          meta.fields.indexOf("time") !== 0
+          meta.fields.indexOf("timestamp") !== 0
         ) {
           return true;
         }
@@ -105,7 +105,7 @@ export default function LocationTrace() {
       const locationData = results.data.map((location) => {
         return {
           ...location,
-          date: format(new Date(location.time), "dd/MM/yyyy"),
+          date: format(new Date(location.timestamp), "dd/MM/yyyy"),
         };
       });
       const dateLocationMap = {};

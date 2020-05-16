@@ -59,7 +59,7 @@ export default function Map({
       const infoContent = `<div class="${
         classes.infoRoot
       }"><h3 id="firstHeading">${format(
-        new Date(location.time),
+        new Date(location.timestamp),
         "h:mm a"
       )}</h3><div class="${classes.infoRow}"><span class="${
         classes.infoRowTitle
