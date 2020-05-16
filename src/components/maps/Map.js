@@ -63,11 +63,7 @@ export default function Map({
         "h:mm a"
       )}</h3><div class="${classes.infoRow}"><span class="${
         classes.infoRowTitle
-<<<<<<< HEAD
-      }">Index</span><span>${index}</span></div><div class="${
-=======
       }">Index</span><span>${index + 1}</span></div><div class="${
->>>>>>> ae40de7e3bcdfee27f8fd7c624f1a01294d1068d
         classes.infoRow
       }"><span class="${
         classes.infoRowTitle
